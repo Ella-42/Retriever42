@@ -10,7 +10,8 @@ const fs = require('fs');
 const URL = 'https://api.intra.42.fr/v2';
 
 // Set the URI as a variable
-const URI = 'https://retriever.ella-peeters.me';
+const URI = `https://${process.env.domain}:8443`;
+//const URI = `https://${process.env.domain}`;
 
 // Fetch access token needed for further data requests
 function getToken(code)

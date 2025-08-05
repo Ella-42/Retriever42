@@ -5,20 +5,23 @@ services:
   retriever:
     image: node:latest
     container_name: retriever
+    restart: on-failure:3
+    environment:
+      - domain=retriever.ella-peeters.me
     working_dir: /var/www/js
     volumes:
       - ./application:/var/www/js:rw
       - /srv/retriever/.env:/var/www/js/.env:ro
-    ports:
-      - "8443:8443"
     command: sh -c "npm install > /dev/null 2> /dev/null && node retrieverServer.js"
 
   webserver:
     image: nginx:latest
     container_name: webserver
+    restart: on-failure:3
+    environment:
+      - domain=retriever.ella-peeters.me
     ports:
-      - "80:80"
-      - "443:443"
+      - "8443:8443"
     depends_on:
       - retriever
     volumes:
