@@ -6,11 +6,18 @@
 #    By: lpeeters <lpeeters@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/18 20:28:30 by lpeeters          #+#    #+#              #
-#    Updated: 2025/08/05 16:34:03 by lpeeters         ###   ########.fr        #
+#    Updated: 2025/08/05 17:23:20 by lpeeters         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-filter = --filter "label=com.docker.compose.project=Retriever"
+containers = retriever webserver
+
+define nameFilter
+--filter "name=$1"
+endef
+
+statusFilter = $(foreach name, $(containers), $(call nameFilter, $(name)))
+cleanFilter = --filter "label=com.docker.compose.project=Retriever"
 
 silent = 2> /dev/null
 
@@ -21,7 +28,7 @@ down:
 	@docker-compose down
 
 status:
-	@docker ps -a
+	@docker ps -a $(statusFilter)
 
 webserver:
 	@docker exec -it nginx sh
@@ -30,11 +37,11 @@ retriever:
 	@docker exec -it retriever sh
 
 clean:
-	@docker stop $$(docker ps -qa $(filter)) $(silent); \
-	 docker rm $$(docker ps -qa $(filter)) $(silent); \
-	 docker rmi -f $$(docker images -qa $(filter)) $(silent); \
-	 docker volume rm $$(docker volume ls -q $(filter)) $(silent); \
-	 docker network rm $$(docker network ls -q $(filter)) $(silent) || true
+	@docker stop $$(docker ps -qa $(cleanFilter)) $(silent); \
+	 docker rm $$(docker ps -qa $(cleanFilter)) $(silent); \
+	 docker rmi -f $$(docker images -qa $(cleanFilter)) $(silent); \
+	 docker volume rm $$(docker volume ls -q $(cleanFilter)) $(silent); \
+	 docker network rm $$(docker network ls -q $(cleanFilter)) $(silent) || true
 
 log:
 	@echo 'Webserver:'
